@@ -26,7 +26,7 @@ Make sure you have Node.js and npm installed on your local machine. You will als
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/your-username/csc400-capstone.git](https://github.com/your-username/csc400-capstone.git)
+   git clone git@github.com:joshkukl/csc400-capstone.git
    cd csc400-capstone
    ```
 

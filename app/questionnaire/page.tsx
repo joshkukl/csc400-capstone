@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { FormData, Field, Step } from "@/types/types";
-import { STEPS, INITIAL_FORM_DATA } from "@/lib/questionnaire";
+import { STEPS, INITIAL_FORM_DATA } from "@/constants/questionnaire";
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 

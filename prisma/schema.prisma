@@ -1,0 +1,18 @@
+// SQLite for local capstone development. Switch provider to "postgresql"
+// and update DATABASE_URL to migrate to PostgreSQL for production.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}

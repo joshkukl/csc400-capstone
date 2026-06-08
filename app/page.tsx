@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AuthNavLinks } from "@/components/AuthNavLinks";
 
 const features = [
   {
@@ -21,8 +22,9 @@ const features = [
 export default function Home() {
   return (
     <main className="flex flex-1 flex-col">
-      <nav className="border-b border-foreground/10 px-6 py-4">
+      <nav className="flex items-center justify-between border-b border-foreground/10 px-6 py-4">
         <span className="font-semibold tracking-tight">StackRec</span>
+        <AuthNavLinks />
       </nav>
 
       <section className="flex flex-1 flex-col items-center justify-center px-6 py-24 text-center">

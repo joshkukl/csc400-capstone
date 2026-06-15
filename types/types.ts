@@ -1,9 +1,10 @@
 export type FormData = {
   projectType: string;
-  teamSize: string;
+  audience: string;
+  languagePreference: string;
   userLoad: string;
   realTime: string;
-  dataComplexity: string;
+  dataNeed: string;
   timeline: string;
   experience: string;
   priority: string;

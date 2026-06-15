@@ -1,4 +1,4 @@
-import type { FormData, Step } from "@/types/types";
+import type { FormData, Step } from "@/types/questionnaire";
 
 export const STEPS: Step[] = [
   {

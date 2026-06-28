@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { FormData, Field, Step } from "@/types/questionnaire";
 import { STEPS, INITIAL_FORM_DATA } from "@/constants/questionnaire";
 
@@ -99,6 +100,7 @@ function RadioGroup({
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Questionnaire() {
+  const router = useRouter();
   const [stepIndex, setStepIndex] = useState(0);
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
 
@@ -118,8 +120,18 @@ export default function Questionnaire() {
     setStepIndex((i) => i - 1);
   }
 
-  function handleSubmit() {
-    // Joshua wires this to the recommendation API and navigates to /results
+  async function handleSubmit() {
+    const response = await fetch("/api/recommend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+
+    if (!response.ok) return;
+
+    const { recommendation } = await response.json();
+    const params = new URLSearchParams({ data: JSON.stringify(recommendation) });
+    router.push(`/results?${params}`);
   }
 
   return (

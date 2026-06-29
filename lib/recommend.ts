@@ -1,16 +1,5 @@
 import type { FormData } from "@/types/questionnaire";
-
-export type StackItem = {
-  role: string;
-  name: string;
-  rationale: string;
-};
-
-export type Recommendation = {
-  title: string;
-  summary: string;
-  stack: StackItem[];
-};
+import type { Recommendation, StackItem } from "@/types/recommendation";
 
 type Runtime =
   | "typescript"

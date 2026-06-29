@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import type { Recommendation } from "@/lib/recommend";
+import type { Recommendation } from "@/types/recommendation";
 
 function ResultsContent() {
   const searchParams = useSearchParams();

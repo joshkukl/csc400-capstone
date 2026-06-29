@@ -1,5 +1,5 @@
 import type { FormData } from "@/types/questionnaire";
-import type { Recommendation, StackItem } from "@/types/recommendation";
+import type { Recommendation, StackItem } from "@/types/recommend";
 
 type Runtime =
   | "typescript"

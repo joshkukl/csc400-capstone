@@ -3,7 +3,51 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import type { Recommendation } from "@/types/recommend";
+import type { LayerResult, Recommendation } from "@/types/recommend";
+
+function ConfidenceBar({ value }: { value: number }) {
+  return (
+    <div className="mt-2 flex items-center gap-3">
+      <div className="h-1.5 flex-1 rounded-full bg-foreground/10">
+        <div
+          className="h-1.5 rounded-full bg-foreground/50 transition-all"
+          style={{ width: `${value}%` }}
+        />
+      </div>
+      <span className="w-8 text-right text-xs text-foreground/40">{value}%</span>
+    </div>
+  );
+}
+
+function LayerCard({ layer }: { layer: LayerResult }) {
+  return (
+    <div className="rounded-2xl border border-foreground/10 p-6">
+      <p className="mb-1 text-xs font-medium uppercase tracking-widest text-foreground/40">
+        {layer.primary.role}
+      </p>
+      <p className="text-lg font-semibold">{layer.primary.name}</p>
+      <ConfidenceBar value={layer.primary.confidence} />
+      <p className="mt-3 text-sm text-foreground/60">{layer.primary.rationale}</p>
+
+      {layer.alternatives.length > 0 && (
+        <div className="mt-5 border-t border-foreground/8 pt-4">
+          <p className="mb-3 text-xs font-medium text-foreground/30">Alternatives</p>
+          <div className="flex flex-col gap-3">
+            {layer.alternatives.map((alt) => (
+              <div key={alt.name}>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium">{alt.name}</p>
+                </div>
+                <ConfidenceBar value={alt.confidence} />
+                <p className="mt-1 text-xs text-foreground/50">{alt.rationale}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function ResultsContent() {
   const searchParams = useSearchParams();
@@ -43,24 +87,13 @@ function ResultsContent() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight">
-          {recommendation.title}
-        </h1>
+        <h1 className="text-3xl font-semibold tracking-tight">{recommendation.title}</h1>
         <p className="mt-2 text-sm text-foreground/50">{recommendation.summary}</p>
       </div>
 
       <div className="flex flex-col gap-4">
-        {recommendation.stack.map((item) => (
-          <div
-            key={item.role}
-            className="rounded-2xl border border-foreground/10 p-6"
-          >
-            <p className="mb-1 text-xs font-medium uppercase tracking-widest text-foreground/40">
-              {item.role}
-            </p>
-            <p className="text-lg font-semibold">{item.name}</p>
-            <p className="mt-2 text-sm text-foreground/60">{item.rationale}</p>
-          </div>
+        {recommendation.layers.map((layer) => (
+          <LayerCard key={layer.role} layer={layer} />
         ))}
       </div>
 
@@ -71,6 +104,12 @@ function ResultsContent() {
         >
           Start over
         </Link>
+        <Link
+          href="/history"
+          className="inline-flex h-10 items-center justify-center rounded-full border border-foreground/15 px-6 text-sm font-medium transition-colors hover:bg-foreground/5"
+        >
+          View history
+        </Link>
       </div>
     </div>
   );
@@ -80,7 +119,7 @@ function ResultsFallback() {
   return (
     <div className="flex flex-col gap-4">
       {[...Array(4)].map((_, i) => (
-        <div key={i} className="h-28 animate-pulse rounded-2xl bg-foreground/5" />
+        <div key={i} className="h-36 animate-pulse rounded-2xl bg-foreground/5" />
       ))}
     </div>
   );

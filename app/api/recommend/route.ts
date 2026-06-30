@@ -1,6 +1,8 @@
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import type { FormData } from "@/types/questionnaire";
 import { recommend } from "@/lib/recommend";
+import { prisma } from "@/lib/db";
+import { getSessionFromRequest } from "@/lib/auth";
 
 const REQUIRED_FIELDS: (keyof FormData)[] = [
   "projectType",
@@ -14,7 +16,7 @@ const REQUIRED_FIELDS: (keyof FormData)[] = [
   "priority",
 ];
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as Partial<FormData>;
 
@@ -27,7 +29,20 @@ export async function POST(request: Request) {
       }
     }
 
-    const recommendation = recommend(body as FormData);
+    const data = body as FormData;
+    const recommendation = recommend(data);
+    const session = await getSessionFromRequest(request);
+
+    await prisma.recommendation.create({
+      data: {
+        userId: session?.userId ?? null,
+        ...data,
+        title: recommendation.title,
+        summary: recommendation.summary,
+        resultJson: JSON.stringify(recommendation.layers),
+      },
+    });
+
     return NextResponse.json({ recommendation });
   } catch {
     return NextResponse.json(

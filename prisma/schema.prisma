@@ -10,9 +10,32 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  username     String   @unique
-  passwordHash String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id              String           @id @default(cuid())
+  username        String           @unique
+  passwordHash    String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  recommendations Recommendation[]
+}
+
+model Recommendation {
+  id                 String   @id @default(cuid())
+  userId             String?
+  user               User?    @relation(fields: [userId], references: [id])
+
+  projectType        String
+  audience           String
+  languagePreference String
+  userLoad           String
+  realTime           String
+  dataNeed           String
+  timeline           String
+  experience         String
+  priority           String
+
+  title              String
+  summary            String
+  resultJson         String
+
+  createdAt          DateTime @default(now())
 }

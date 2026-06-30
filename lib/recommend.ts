@@ -1,15 +1,5 @@
 import type { FormData } from "@/types/questionnaire";
-import type { Recommendation, StackItem } from "@/types/recommend";
-
-type Runtime =
-  | "typescript"
-  | "python"
-  | "go"
-  | "java"
-  | "dotnet"
-  | "ruby"
-  | "rust"
-  | "csharp";
+import type { Recommendation, Runtime, StackItem } from "@/types/recommend";
 
 function resolveRuntime(data: FormData): Runtime {
   const map: Partial<Record<string, Runtime>> = {

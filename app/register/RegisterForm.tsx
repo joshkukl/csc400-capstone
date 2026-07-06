@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { PasswordInput } from "@/components/PasswordInput";
 import { register } from "@/lib/authClient";
 
 export function RegisterForm() {
@@ -60,15 +61,11 @@ export function RegisterForm() {
           <label htmlFor="password" className="mb-2 block text-sm font-medium">
             Password
           </label>
-          <input
+          <PasswordInput
             id="password"
-            type="password"
-            autoComplete="new-password"
-            required
-            minLength={8}
             value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            className="w-full rounded-xl border border-foreground/15 bg-transparent px-4 py-3 text-sm outline-none transition-colors focus:border-foreground/40"
+            onChange={setPassword}
+            autoComplete="new-password"
             placeholder="At least 8 characters"
           />
         </div>

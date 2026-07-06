@@ -20,7 +20,60 @@ The Tech-Stack Recommendation Engine is an interactive, web-based tool designed 
 ## Getting Started
 
 ### Prerequisites
-Make sure you have Node.js and npm installed on your local machine. You will also need a local or cloud instance of PostgreSQL running.
+Make sure you have Node.js and npm installed on your local machine.
+
+### Prisma / Auth environment setup
+
+`.env.example` in the project root is **only a template**. Prisma and Next.js **do not read** `.env.example`.
+
+Each developer must create their own real **`.env`** file in the **project root** (same folder as `package.json`). The filename must be exactly `.env` — not `.env.txt`, not `.env.example`, and not a file inside another folder.
+
+Your real `.env` file must include:
+
+```env
+DATABASE_URL="file:./dev.db"
+SESSION_SECRET="your-generated-secret-here"
+```
+
+- `DATABASE_URL="file:./dev.db"` tells Prisma to create and use a local SQLite database at `prisma/dev.db` when you run migrations.
+- `SESSION_SECRET` is used to sign authentication session cookies. Use a long random string locally.
+
+**Never commit your real `.env` file.**
+
+Generate a secure local session secret:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+Copy the output into `.env` as the value for `SESSION_SECRET`.
+
+#### Create `.env` on Windows (PowerShell)
+
+From the project root:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Then open `.env`, replace `SESSION_SECRET` with your generated secret, and save.
+
+#### Troubleshooting: `Environment variable not found: DATABASE_URL`
+
+If `npx prisma migrate dev` fails with:
+
+```text
+Error: Prisma schema validation - P1012
+Environment variable not found: DATABASE_URL
+```
+
+then one of the following is true:
+
+1. You have **not created** a real `.env` file in the project root.
+2. The file is **named incorrectly** (for example `.env.txt` instead of `.env`).
+3. `.env` exists but is **missing** `DATABASE_URL`, or the line is misspelled.
+
+Fix: create or rename the file to `.env` in the project root and include `DATABASE_URL="file:./dev.db"`.
 
 ### Installation
 
@@ -30,17 +83,19 @@ Make sure you have Node.js and npm installed on your local machine. You will als
    cd csc400-capstone
    ```
 
-First, run the development server:
+2. **Create your local `.env` file** (see [Prisma / Auth environment setup](#prisma--auth-environment-setup) above).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+3. **Install dependencies and set up the database:**
+   ```bash
+   npm install
+   npx prisma generate
+   npx prisma migrate dev
+   ```
+
+4. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 

@@ -21,8 +21,9 @@ function resolveLayer(
   role: Candidate["role"],
   data: FormData,
   topN = 3,
+  filter?: (name: string) => boolean,
 ): LayerResult | null {
-  const scored = CANDIDATES.filter((c) => c.role === role)
+  const scored = CANDIDATES.filter((c) => c.role === role && (!filter || filter(c.name)))
     .map((c) => ({ candidate: c, score: scoreCandidate(c, data) }))
     .sort((a, b) => b.score - a.score)
     .slice(0, topN);
@@ -46,11 +47,39 @@ function resolveLayer(
   };
 }
 
+const NODE_BACKENDS = new Set(["Express", "Fastify", "Hono"]);
+const JS_FULLSTACKS = new Set(["Next.js", "SvelteKit", "Vue + Nuxt"]);
+
+function realtimeFilter(
+  name: string,
+  backendName: string | null,
+  databaseName: string,
+  frontendName: string,
+  isFullstack: boolean,
+): boolean {
+  if (name === "Django Channels") return backendName === "Django";
+  if (name === "Supabase Realtime") return databaseName === "Supabase";
+  if (name === "Socket.io") {
+    return (
+      (backendName !== null && NODE_BACKENDS.has(backendName)) ||
+      (isFullstack && JS_FULLSTACKS.has(frontendName))
+    );
+  }
+  return true;
+}
+
 export function recommend(data: FormData): Recommendation {
   const frontend = resolveLayer("Frontend", data);
   const frontendHandlesBackend =
     CANDIDATES.find((c) => c.name === frontend?.primary.name)?.handlesBackend ??
     false;
+
+  const backend = frontendHandlesBackend ? null : resolveLayer("Backend", data);
+  const database = resolveLayer("Database", data);
+
+  const frontendName = frontend?.primary.name ?? "";
+  const backendName = backend?.primary.name ?? null;
+  const databaseName = database?.primary.name ?? "";
 
   const layers: LayerResult[] = [
     frontend && {
@@ -60,9 +89,13 @@ export function recommend(data: FormData): Recommendation {
         role: frontendHandlesBackend ? "Full-Stack" : "Frontend",
       },
     },
-    frontendHandlesBackend ? null : resolveLayer("Backend", data),
-    resolveLayer("Database", data),
-    data.realTime === "yes" ? resolveLayer("Realtime", data) : null,
+    backend,
+    database,
+    data.realTime === "yes"
+      ? resolveLayer("Realtime", data, 3, (name) =>
+          realtimeFilter(name, backendName, databaseName, frontendName, frontendHandlesBackend),
+        )
+      : null,
     resolveLayer("Hosting", data),
   ].filter((l): l is LayerResult => l !== null);
 

@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import type { LayerResult, Recommendation } from "@/types/recommend";
+import { StackDiagram } from "@/components/StackDiagram";
 
 function ConfidenceBar({ value }: { value: number }) {
   return (
@@ -90,6 +91,8 @@ function ResultsContent() {
         <h1 className="text-3xl font-semibold tracking-tight">{recommendation.title}</h1>
         <p className="mt-2 text-sm text-foreground/50">{recommendation.summary}</p>
       </div>
+
+      <StackDiagram layers={recommendation.layers} />
 
       <div className="flex flex-col gap-4">
         {recommendation.layers.map((layer) => (

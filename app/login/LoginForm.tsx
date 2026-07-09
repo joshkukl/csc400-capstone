@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { PasswordInput } from "@/components/PasswordInput";
 import { login } from "@/lib/authClient";
 
 export function LoginForm() {
@@ -60,15 +61,11 @@ export function LoginForm() {
           <label htmlFor="password" className="mb-2 block text-sm font-medium">
             Password
           </label>
-          <input
+          <PasswordInput
             id="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            minLength={8}
             value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            className="w-full rounded-xl border border-foreground/15 bg-transparent px-4 py-3 text-sm outline-none transition-colors focus:border-foreground/40"
+            onChange={setPassword}
+            autoComplete="current-password"
             placeholder="Enter your password"
           />
         </div>

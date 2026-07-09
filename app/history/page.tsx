@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { LayerResult } from "@/types/recommend";
 
 type SavedRecommendation = {
@@ -13,7 +14,17 @@ type SavedRecommendation = {
   resultJson: string;
 };
 
-function HistoryCard({ rec }: { rec: SavedRecommendation }) {
+function HistoryCard({
+  rec,
+  compareMode,
+  selected,
+  onToggle,
+}: {
+  rec: SavedRecommendation;
+  compareMode: boolean;
+  selected: boolean;
+  onToggle: (id: string) => void;
+}) {
   const layers = JSON.parse(rec.resultJson) as LayerResult[];
   const date = new Date(rec.createdAt).toLocaleDateString("en-US", {
     month: "short",
@@ -22,14 +33,38 @@ function HistoryCard({ rec }: { rec: SavedRecommendation }) {
   });
 
   return (
-    <div className="rounded-2xl border border-foreground/10 p-6">
+    <div
+      className={`rounded-2xl border p-6 transition-colors ${
+        compareMode
+          ? selected
+            ? "cursor-pointer border-foreground/40 bg-foreground/5"
+            : "cursor-pointer border-foreground/10 hover:border-foreground/20"
+          : "border-foreground/10"
+      }`}
+      onClick={() => compareMode && onToggle(rec.id)}
+    >
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-xs text-foreground/40">{date}</p>
-          <p className="mt-1 text-lg font-semibold">{rec.title}</p>
-          <p className="mt-1 text-sm text-foreground/50">{rec.summary}</p>
+        <div className="flex items-start gap-3">
+          {compareMode && (
+            <div
+              className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+                selected
+                  ? "border-foreground bg-foreground"
+                  : "border-foreground/30"
+              }`}
+            >
+              {selected && (
+                <span className="text-[10px] font-bold text-background">✓</span>
+              )}
+            </div>
+          )}
+          <div>
+            <p className="text-xs text-foreground/40">{date}</p>
+            <p className="mt-1 text-lg font-semibold">{rec.title}</p>
+            <p className="mt-1 text-sm text-foreground/50">{rec.summary}</p>
+          </div>
         </div>
-        <span className="shrink-0 rounded-full border border-foreground/10 px-3 py-1 text-xs text-foreground/50 capitalize">
+        <span className="shrink-0 rounded-full border border-foreground/10 px-3 py-1 text-xs capitalize text-foreground/50">
           {rec.projectType}
         </span>
       </div>
@@ -49,9 +84,12 @@ function HistoryCard({ rec }: { rec: SavedRecommendation }) {
 }
 
 export default function HistoryPage() {
+  const router = useRouter();
   const [recommendations, setRecommendations] = useState<SavedRecommendation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [compareMode, setCompareMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   useEffect(() => {
     fetch("/api/recommendations", { credentials: "include" })
@@ -69,6 +107,27 @@ export default function HistoryPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  function toggleSelect(id: string) {
+    setSelectedIds((prev) =>
+      prev.includes(id)
+        ? prev.filter((x) => x !== id)
+        : prev.length < 2
+          ? [...prev, id]
+          : prev,
+    );
+  }
+
+  function exitCompareMode() {
+    setCompareMode(false);
+    setSelectedIds([]);
+  }
+
+  function goCompare() {
+    if (selectedIds.length === 2) {
+      router.push(`/compare?a=${selectedIds[0]}&b=${selectedIds[1]}`);
+    }
+  }
+
   return (
     <main className="flex flex-1 flex-col">
       <nav className="border-b border-foreground/10 px-6 py-4">
@@ -80,17 +139,52 @@ export default function HistoryPage() {
       <div className="mx-auto w-full max-w-2xl flex-1 px-6 py-12">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Your recommendations</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Your recommendations
+            </h1>
             <p className="mt-1 text-sm text-foreground/50">
-              Every stack recommendation you've generated.
+              {compareMode
+                ? `Select two to compare (${selectedIds.length}/2 selected)`
+                : "Every stack recommendation you've generated."}
             </p>
           </div>
-          <Link
-            href="/questionnaire"
-            className="inline-flex h-10 items-center justify-center rounded-full bg-foreground px-6 text-sm font-medium text-background transition-colors hover:bg-foreground/85"
-          >
-            New
-          </Link>
+
+          <div className="flex items-center gap-2">
+            {compareMode ? (
+              <>
+                <button
+                  onClick={exitCompareMode}
+                  className="inline-flex h-10 items-center justify-center rounded-full border border-foreground/15 px-5 text-sm font-medium transition-colors hover:bg-foreground/5"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={goCompare}
+                  disabled={selectedIds.length < 2}
+                  className="inline-flex h-10 items-center justify-center rounded-full bg-foreground px-5 text-sm font-medium text-background transition-colors hover:bg-foreground/85 disabled:cursor-not-allowed disabled:opacity-35"
+                >
+                  Compare
+                </button>
+              </>
+            ) : (
+              <>
+                {recommendations.length >= 2 && (
+                  <button
+                    onClick={() => setCompareMode(true)}
+                    className="inline-flex h-10 items-center justify-center rounded-full border border-foreground/15 px-5 text-sm font-medium transition-colors hover:bg-foreground/5"
+                  >
+                    Compare
+                  </button>
+                )}
+                <Link
+                  href="/questionnaire"
+                  className="inline-flex h-10 items-center justify-center rounded-full bg-foreground px-5 text-sm font-medium text-background transition-colors hover:bg-foreground/85"
+                >
+                  New
+                </Link>
+              </>
+            )}
+          </div>
         </div>
 
         {loading && (
@@ -130,7 +224,13 @@ export default function HistoryPage() {
         {!loading && !error && recommendations.length > 0 && (
           <div className="flex flex-col gap-4">
             {recommendations.map((rec) => (
-              <HistoryCard key={rec.id} rec={rec} />
+              <HistoryCard
+                key={rec.id}
+                rec={rec}
+                compareMode={compareMode}
+                selected={selectedIds.includes(rec.id)}
+                onToggle={toggleSelect}
+              />
             ))}
           </div>
         )}

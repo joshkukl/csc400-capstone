@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { HoverGrowLink } from "@/components/HoverGrowLink";
 import { fetchCurrentUser, logout } from "@/lib/authClient";
 
 export function AuthNavLinks() {
@@ -23,17 +23,17 @@ export function AuthNavLinks() {
   }
 
   if (loading) {
-    return <div className="h-9 w-32" aria-hidden="true" />;
+    return <div className="h-11 w-32" aria-hidden="true" />;
   }
 
   if (username) {
     return (
       <div className="flex items-center gap-4 text-sm">
-        <span className="text-foreground/50">Signed in as {username}</span>
+        <span className="text-white/55">Signed in as {username}</span>
         <button
           type="button"
           onClick={handleLogout}
-          className="font-medium transition-colors hover:text-foreground/70"
+          className="font-medium text-white transition-colors hover:text-white/70"
         >
           Log out
         </button>
@@ -43,18 +43,18 @@ export function AuthNavLinks() {
 
   return (
     <div className="flex items-center gap-4 text-sm">
-      <Link
+      <HoverGrowLink
         href="/login"
-        className="font-medium transition-colors hover:text-foreground/70"
+        className="inline-flex h-11 items-center justify-center rounded-full bg-white px-6 text-sm font-medium text-[#05070c] transition-colors hover:bg-white/85 sm:px-8"
       >
         Log in
-      </Link>
-      <Link
+      </HoverGrowLink>
+      <HoverGrowLink
         href="/register"
-        className="inline-flex h-9 items-center justify-center rounded-full border border-foreground/15 px-4 font-medium transition-colors hover:bg-foreground/5"
+        className="inline-flex h-11 items-center justify-center rounded-full border border-white/15 px-6 font-medium text-white transition-colors hover:bg-white/5"
       >
         Register
-      </Link>
+      </HoverGrowLink>
     </div>
   );
 }

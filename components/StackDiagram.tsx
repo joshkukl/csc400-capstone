@@ -25,6 +25,13 @@ const StackDiagramScene = dynamic(() => import("./StackDiagramScene"), {
   ),
 });
 
-export function StackDiagram({ layers }: { layers: LayerResult[] }) {
-  return <StackDiagramScene layers={layers} />;
+type StackDiagramProps = {
+  layers: LayerResult[];
+  onIntroComplete?: () => void;
+};
+
+export function StackDiagram({ layers, onIntroComplete }: StackDiagramProps) {
+  return (
+    <StackDiagramScene layers={layers} onIntroComplete={onIntroComplete} />
+  );
 }

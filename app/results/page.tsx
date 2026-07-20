@@ -1,10 +1,15 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import type { LayerResult, Recommendation } from "@/types/recommend";
 import { StackDiagram } from "@/components/StackDiagram";
+import {
+  prefersReducedMotion,
+  revealImmediately,
+  staggerReveal,
+} from "@/lib/motion/animeReveal";
 
 function ConfidenceBar({ value }: { value: number }) {
   return (
@@ -22,7 +27,7 @@ function ConfidenceBar({ value }: { value: number }) {
 
 function LayerCard({ layer }: { layer: LayerResult }) {
   return (
-    <div className="rounded-2xl border border-foreground/10 p-6">
+    <div className="rounded-2xl border border-foreground/10 p-6" data-reveal>
       <p className="mb-1 text-xs font-medium uppercase tracking-widest text-foreground/40">
         {layer.primary.role}
       </p>
@@ -53,6 +58,42 @@ function LayerCard({ layer }: { layer: LayerResult }) {
 function ResultsContent() {
   const searchParams = useSearchParams();
   const raw = searchParams.get("data");
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [diagramReady, setDiagramReady] = useState(false);
+
+  const handleDiagramComplete = useCallback(() => {
+    setDiagramReady(true);
+  }, []);
+
+  useEffect(() => {
+    const fallback = window.setTimeout(() => {
+      setDiagramReady(true);
+    }, 5000);
+
+    return () => window.clearTimeout(fallback);
+  }, []);
+
+  useEffect(() => {
+    if (!diagramReady) return;
+
+    const root = contentRef.current;
+    if (!root) return;
+
+    const elements = Array.from(
+      root.querySelectorAll<HTMLElement>("[data-reveal]"),
+    );
+
+    if (prefersReducedMotion()) {
+      revealImmediately(elements);
+      return;
+    }
+
+    return staggerReveal(elements, {
+      distanceY: -14,
+      duration: 360,
+      staggerMs: 80,
+    });
+  }, [diagramReady]);
 
   if (!raw) {
     return (
@@ -86,33 +127,50 @@ function ResultsContent() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight">{recommendation.title}</h1>
-        <p className="mt-2 text-sm text-foreground/50">{recommendation.summary}</p>
+    <div ref={contentRef} className="flex flex-col gap-6">
+      <div
+        className={diagramReady ? undefined : "pointer-events-none opacity-0"}
+        aria-hidden={!diagramReady}
+      >
+        <h1 className="text-3xl font-semibold tracking-tight" data-reveal>
+          {recommendation.title}
+        </h1>
+        <p className="mt-2 text-sm text-foreground/50" data-reveal>
+          {recommendation.summary}
+        </p>
       </div>
 
-      <StackDiagram layers={recommendation.layers} />
+      <StackDiagram
+        layers={recommendation.layers}
+        onIntroComplete={handleDiagramComplete}
+      />
 
-      <div className="flex flex-col gap-4">
-        {recommendation.layers.map((layer) => (
-          <LayerCard key={layer.role} layer={layer} />
-        ))}
-      </div>
+      <div
+        className={diagramReady ? undefined : "pointer-events-none opacity-0"}
+        aria-hidden={!diagramReady}
+      >
+        <div className="flex flex-col gap-4">
+          {recommendation.layers.map((layer) => (
+            <LayerCard key={layer.role} layer={layer} />
+          ))}
+        </div>
 
-      <div className="flex gap-4 pt-2">
-        <Link
-          href="/questionnaire"
-          className="inline-flex h-10 items-center justify-center rounded-full border border-foreground/15 px-6 text-sm font-medium transition-colors hover:bg-foreground/5"
-        >
-          Start over
-        </Link>
-        <Link
-          href="/history"
-          className="inline-flex h-10 items-center justify-center rounded-full border border-foreground/15 px-6 text-sm font-medium transition-colors hover:bg-foreground/5"
-        >
-          View history
-        </Link>
+        <div className="mt-6 flex gap-4 pt-2">
+          <Link
+            href="/questionnaire"
+            data-reveal
+            className="inline-flex h-10 items-center justify-center rounded-full border border-foreground/15 px-6 text-sm font-medium transition-colors hover:bg-foreground/5"
+          >
+            Start over
+          </Link>
+          <Link
+            href="/history"
+            data-reveal
+            className="inline-flex h-10 items-center justify-center rounded-full border border-foreground/15 px-6 text-sm font-medium transition-colors hover:bg-foreground/5"
+          >
+            View history
+          </Link>
+        </div>
       </div>
     </div>
   );

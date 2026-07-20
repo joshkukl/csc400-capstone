@@ -1,10 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { FormData, Field, Step } from "@/types/questionnaire";
 import { STEPS, INITIAL_FORM_DATA } from "@/constants/questionnaire";
+import {
+  prefersReducedMotion,
+  revealImmediately,
+  staggerReveal,
+} from "@/lib/motion/animeReveal";
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
@@ -16,7 +21,7 @@ function StepIndicator({
   steps: Step[];
 }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2" data-reveal>
       {steps.map((step, i) => (
         <div key={step.title} className="flex items-center gap-2">
           <div
@@ -59,11 +64,14 @@ function RadioGroup({
 }) {
   return (
     <fieldset>
-      <legend className="mb-3 font-medium">{field.label}</legend>
+      <legend className="mb-3 font-medium" data-reveal>
+        {field.label}
+      </legend>
       <div className="flex flex-col gap-2">
         {field.options.map((opt) => (
           <label
             key={opt.value}
+            data-reveal
             className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-sm transition-colors ${
               value === opt.value
                 ? "border-foreground bg-foreground/5 font-medium"
@@ -103,6 +111,7 @@ export default function Questionnaire() {
   const router = useRouter();
   const [stepIndex, setStepIndex] = useState(0);
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const currentStep = STEPS[stepIndex];
   const isLast = stepIndex === STEPS.length - 1;
@@ -134,6 +143,22 @@ export default function Questionnaire() {
     router.push(`/results?${params}`);
   }
 
+  useEffect(() => {
+    const root = contentRef.current;
+    if (!root) return;
+
+    const elements = Array.from(
+      root.querySelectorAll<HTMLElement>("[data-reveal]"),
+    );
+
+    if (prefersReducedMotion()) {
+      revealImmediately(elements);
+      return;
+    }
+
+    return staggerReveal(elements, { duration: 210, staggerMs: 55 });
+  }, [stepIndex]);
+
   return (
     <main className="flex flex-1 flex-col">
       <nav className="border-b border-foreground/10 px-6 py-4">
@@ -142,14 +167,23 @@ export default function Questionnaire() {
         </Link>
       </nav>
 
-      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-6 py-12">
+      <div
+        ref={contentRef}
+        className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-6 py-12"
+      >
         <StepIndicator currentStep={stepIndex} steps={STEPS} />
 
         <div className="mt-10 mb-8">
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <h1
+            className="text-2xl font-semibold tracking-tight"
+            data-reveal
+          >
             {currentStep.title}
           </h1>
-          <p className="mt-1 text-sm text-foreground/50">
+          <p
+            className="mt-1 text-sm text-foreground/50"
+            data-reveal
+          >
             {currentStep.description}
           </p>
         </div>
@@ -168,6 +202,7 @@ export default function Questionnaire() {
         <div className="mt-10 flex items-center justify-between">
           {stepIndex > 0 ? (
             <button
+              data-reveal
               onClick={handleBack}
               className="inline-flex h-10 items-center justify-center rounded-full border border-foreground/15 px-6 text-sm font-medium transition-colors hover:bg-foreground/5"
             >
@@ -179,6 +214,7 @@ export default function Questionnaire() {
 
           {isLast ? (
             <button
+              data-reveal
               onClick={handleSubmit}
               disabled={!isStepComplete}
               className="inline-flex h-10 items-center justify-center rounded-full bg-foreground px-6 text-sm font-medium text-background transition-colors hover:bg-foreground/85 disabled:opacity-35 disabled:cursor-not-allowed"
@@ -187,6 +223,7 @@ export default function Questionnaire() {
             </button>
           ) : (
             <button
+              data-reveal
               onClick={handleNext}
               disabled={!isStepComplete}
               className="inline-flex h-10 items-center justify-center rounded-full bg-foreground px-6 text-sm font-medium text-background transition-colors hover:bg-foreground/85 disabled:opacity-35 disabled:cursor-not-allowed"

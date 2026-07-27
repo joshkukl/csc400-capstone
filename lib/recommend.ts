@@ -23,7 +23,11 @@ function resolveLayer(
   topN = 3,
   filter?: (name: string) => boolean,
 ): LayerResult | null {
-  const scored = CANDIDATES.filter((c) => c.role === role && (!filter || filter(c.name)))
+  const scored = CANDIDATES.filter((c) => {
+    if (c.role !== role) return false;
+    if (filter && !filter(c.name)) return false;
+    return c.scores.projectType?.[data.projectType] !== 0;
+  })
     .map((c) => ({ candidate: c, score: scoreCandidate(c, data) }))
     .sort((a, b) => b.score - a.score)
     .slice(0, topN);
@@ -49,6 +53,8 @@ function resolveLayer(
 
 const NODE_BACKENDS = new Set(["Express", "Fastify", "Hono"]);
 const JS_FULLSTACKS = new Set(["Next.js", "SvelteKit", "Vue + Nuxt"]);
+const GAME_ENGINES = new Set(["Unity", "Godot", "Unreal Engine"]);
+const NO_FRONTEND_TYPES = new Set(["cli", "api"]);
 
 function realtimeFilter(
   name: string,
@@ -69,13 +75,16 @@ function realtimeFilter(
 }
 
 export function recommend(data: FormData): Recommendation {
-  const frontend = resolveLayer("Frontend", data);
-  const frontendHandlesBackend =
-    CANDIDATES.find((c) => c.name === frontend?.primary.name)?.handlesBackend ??
-    false;
+  const skipFrontend = NO_FRONTEND_TYPES.has(data.projectType);
 
-  const backend = frontendHandlesBackend ? null : resolveLayer("Backend", data);
-  const database = resolveLayer("Database", data);
+  const frontend = skipFrontend ? null : resolveLayer("Frontend", data);
+  const frontendHandlesBackend =
+    !skipFrontend &&
+    (CANDIDATES.find((c) => c.name === frontend?.primary.name)?.handlesBackend ?? false);
+
+  const isGameEngine = GAME_ENGINES.has(frontend?.primary.name ?? "");
+  const backend = (skipFrontend || !frontendHandlesBackend) ? resolveLayer("Backend", data) : null;
+  const database = (isGameEngine && data.realTime === "no") ? null : resolveLayer("Database", data);
 
   const frontendName = frontend?.primary.name ?? "";
   const backendName = backend?.primary.name ?? null;
@@ -86,7 +95,7 @@ export function recommend(data: FormData): Recommendation {
       ...frontend,
       primary: {
         ...frontend.primary,
-        role: frontendHandlesBackend ? "Full-Stack" : "Frontend",
+        role: isGameEngine ? "Game Engine" : frontendHandlesBackend ? "Full-Stack" : "Frontend",
       },
     },
     backend,

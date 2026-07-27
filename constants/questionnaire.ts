@@ -26,7 +26,7 @@ export const STEPS: Step[] = [
           { label: "Consumers (B2C)", value: "b2c" },
           { label: "Businesses (B2B)", value: "b2b" },
           { label: "Internal team only", value: "internal" },
-          { label: "Mixed / Both", value: "mixed" },
+          { label: "Mixed", value: "mixed" },
         ],
       },
       {
@@ -40,6 +40,7 @@ export const STEPS: Step[] = [
           { label: "C# / .NET", value: "dotnet" },
           { label: "Ruby", value: "ruby" },
           { label: "Rust", value: "rust" },
+          { label: "C / C++", value: "cpp" },
           { label: "No preference", value: "none" },
         ],
       },

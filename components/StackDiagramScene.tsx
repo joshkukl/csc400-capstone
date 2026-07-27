@@ -25,6 +25,7 @@ type EdgeData = {
 const ROLE_COLORS: Record<string, string> = {
   Frontend: "#3b82f6",
   "Full-Stack": "#6366f1",
+  "Game Engine": "#ec4899",
   Backend: "#8b5cf6",
   Database: "#10b981",
   Realtime: "#f59e0b",

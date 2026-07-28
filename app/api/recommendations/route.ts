@@ -24,3 +24,14 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({ recommendations });
 }
+
+export async function DELETE(request: NextRequest) {
+  const session = await getSessionFromRequest(request);
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  await prisma.recommendation.deleteMany({ where: { userId: session.userId } });
+
+  return NextResponse.json({ success: true });
+}

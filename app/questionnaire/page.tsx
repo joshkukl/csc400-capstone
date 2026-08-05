@@ -139,7 +139,10 @@ export default function Questionnaire() {
     if (!response.ok) return;
 
     const { recommendation } = await response.json();
-    const params = new URLSearchParams({ data: JSON.stringify(recommendation) });
+    const params = new URLSearchParams({
+      data: JSON.stringify(recommendation),
+      inputs: JSON.stringify(formData),
+    });
     router.push(`/results?${params}`);
   }
 

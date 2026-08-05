@@ -84,7 +84,8 @@ export function recommend(data: FormData): Recommendation {
 
   const isGameEngine = GAME_ENGINES.has(frontend?.primary.name ?? "");
   const backend = (skipFrontend || !frontendHandlesBackend) ? resolveLayer("Backend", data) : null;
-  const database = (isGameEngine && data.realTime === "no") ? null : resolveLayer("Database", data);
+  const skipDatabase = data.projectType === "cli" || (isGameEngine && data.realTime === "no");
+  const database = skipDatabase ? null : resolveLayer("Database", data);
 
   const frontendName = frontend?.primary.name ?? "";
   const backendName = backend?.primary.name ?? null;

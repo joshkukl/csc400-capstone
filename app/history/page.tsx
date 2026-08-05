@@ -10,6 +10,14 @@ type SavedRecommendation = {
   title: string;
   summary: string;
   projectType: string;
+  audience: string;
+  languagePreference: string;
+  userLoad: string;
+  realTime: string;
+  dataNeed: string;
+  timeline: string;
+  experience: string;
+  priority: string;
   createdAt: string;
   resultJson: string;
 };
@@ -22,7 +30,18 @@ function resultsUrl(rec: SavedRecommendation): string {
     layers,
     stack: layers.map((l) => l.primary),
   };
-  return `/results?data=${encodeURIComponent(JSON.stringify(recommendation))}`;
+  const inputs = {
+    projectType: rec.projectType,
+    audience: rec.audience,
+    languagePreference: rec.languagePreference,
+    userLoad: rec.userLoad,
+    realTime: rec.realTime,
+    dataNeed: rec.dataNeed,
+    timeline: rec.timeline,
+    experience: rec.experience,
+    priority: rec.priority,
+  };
+  return `/results?data=${encodeURIComponent(JSON.stringify(recommendation))}&inputs=${encodeURIComponent(JSON.stringify(inputs))}`;
 }
 
 function TrashIcon() {

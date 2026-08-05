@@ -11,6 +11,40 @@ import {
   staggerReveal,
 } from "@/lib/motion/animeReveal";
 
+const INPUT_LABELS: { key: string; label: string; values: Record<string, string> }[] = [
+  { key: "projectType", label: "Project type", values: { web: "Web App / SaaS", mobile: "Mobile App", desktop: "Desktop App", game: "Game", api: "API / Backend", internal: "Internal Tool", cli: "CLI Tool", extension: "Browser Extension" } },
+  { key: "audience", label: "Audience", values: { b2c: "Consumers (B2C)", b2b: "Businesses (B2B)", internal: "Internal team", mixed: "Mixed" } },
+  { key: "languagePreference", label: "Language", values: { js: "JavaScript / TypeScript", python: "Python", go: "Go", java: "Java / Kotlin", dotnet: "C# / .NET", ruby: "Ruby", rust: "Rust", cpp: "C / C++", none: "No preference" } },
+  { key: "userLoad", label: "Concurrent users", values: { tiny: "Under 100", small: "100–10,000", medium: "10,000–1M", large: "1M+", unsure: "Not sure" } },
+  { key: "realTime", label: "Real-time", values: { yes: "Yes", no: "No" } },
+  { key: "dataNeed", label: "Data needs", values: { simple: "Simple CRUD", relational: "Relational / complex", analytics: "Heavy analytics", document: "Document / unstructured", unsure: "Not sure" } },
+  { key: "timeline", label: "Timeline", values: { sprint: "Under 1 month", short: "1–3 months", medium: "3–6 months", long: "6+ months" } },
+  { key: "experience", label: "Experience", values: { beginner: "Beginner", intermediate: "Intermediate", advanced: "Advanced" } },
+  { key: "priority", label: "Priority", values: { speed: "Speed to market", performance: "Performance & scale", cost: "Cost efficiency", dx: "Developer experience" } },
+];
+
+function InputsSummary({ inputs }: { inputs: Record<string, string> }) {
+  return (
+    <div className="rounded-2xl border border-foreground/10 p-5" data-reveal>
+      <p className="mb-3 text-xs font-medium uppercase tracking-widest text-foreground/40">
+        Your inputs
+      </p>
+      <div className="grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-3">
+        {INPUT_LABELS.map(({ key, label, values }) => {
+          const val = inputs[key];
+          if (!val) return null;
+          return (
+            <div key={key}>
+              <p className="text-xs text-foreground/40">{label}</p>
+              <p className="text-sm font-medium">{values[val] ?? val}</p>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function ConfidenceBar({ value }: { value: number }) {
   return (
     <div className="mt-2 flex items-center gap-3">
@@ -58,6 +92,8 @@ function LayerCard({ layer }: { layer: LayerResult }) {
 function ResultsContent() {
   const searchParams = useSearchParams();
   const raw = searchParams.get("data");
+  const rawInputs = searchParams.get("inputs");
+  const inputs: Record<string, string> | null = rawInputs ? (() => { try { return JSON.parse(rawInputs); } catch { return null; } })() : null;
   const contentRef = useRef<HTMLDivElement>(null);
   const [diagramReady, setDiagramReady] = useState(false);
 
@@ -154,6 +190,8 @@ function ResultsContent() {
             <LayerCard key={layer.role} layer={layer} />
           ))}
         </div>
+
+        {inputs && <InputsSummary inputs={inputs} />}
 
         <div className="mt-6 flex gap-4 pt-2">
           <Link

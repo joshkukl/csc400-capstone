@@ -158,7 +158,7 @@ export const CANDIDATES: Candidate[] = [
     rationale:
       "Industry-standard game engine with C# scripting, a large asset store, and cross-platform export to mobile, desktop, and web.",
     scores: {
-      projectType:        { game: 10, desktop: 5, mobile: 6, web: 0, api: 0, internal: 0, cli: 0, extension: 0 },
+      projectType:        { game: 10, desktop: 0, mobile: 0, web: 0, api: 0, internal: 0, cli: 0, extension: 0 },
       audience:           { b2c: 10, b2b: 4, internal: 2, mixed: 7 },
       languagePreference: { dotnet: 10, none: 7, js: 2, python: 2, go: 2, java: 2, ruby: 1, rust: 2, cpp: 5 },
       userLoad:           { tiny: 6, small: 7, medium: 8, large: 9 },
@@ -176,7 +176,7 @@ export const CANDIDATES: Candidate[] = [
     rationale:
       "Free, open-source game engine with GDScript (Python-like) or C# scripting. Lightweight and excellent for 2D games.",
     scores: {
-      projectType:        { game: 10, desktop: 6, mobile: 6, web: 0, api: 0, internal: 0, cli: 0, extension: 0 },
+      projectType:        { game: 10, desktop: 0, mobile: 0, web: 0, api: 0, internal: 0, cli: 0, extension: 0 },
       audience:           { b2c: 10, b2b: 3, internal: 2, mixed: 7 },
       languagePreference: { none: 9, python: 6, js: 2, go: 2, java: 2, dotnet: 3, ruby: 2, rust: 3, cpp: 7 },
       userLoad:           { tiny: 7, small: 8, medium: 8, large: 7 },
@@ -194,7 +194,7 @@ export const CANDIDATES: Candidate[] = [
     rationale:
       "AAA-grade game engine with C++ scripting and Blueprint visual scripting. Industry standard for high-fidelity 3D games and interactive simulations.",
     scores: {
-      projectType:        { game: 10, desktop: 4, mobile: 3, web: 0, api: 0, internal: 0, cli: 0, extension: 0 },
+      projectType:        { game: 10, desktop: 0, mobile: 0, web: 0, api: 0, internal: 0, cli: 0, extension: 0 },
       audience:           { b2c: 10, b2b: 5, internal: 2, mixed: 7 },
       languagePreference: { cpp: 10, none: 5, dotnet: 2, python: 2, js: 1, go: 1, java: 1, ruby: 1, rust: 2 },
       userLoad:           { tiny: 4, small: 6, medium: 8, large: 10 },

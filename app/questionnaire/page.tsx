@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { FormData, Field, Step } from "@/types/questionnaire";
 import { STEPS, INITIAL_FORM_DATA } from "@/constants/questionnaire";
+import { AppHeader } from "@/components/AppHeader";
+import { LoadingOverlay } from "@/components/LoadingOverlay";
 import {
   prefersReducedMotion,
   revealImmediately,
@@ -111,6 +112,7 @@ export default function Questionnaire() {
   const router = useRouter();
   const [stepIndex, setStepIndex] = useState(0);
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
+  const [submitting, setSubmitting] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const currentStep = STEPS[stepIndex];
@@ -130,17 +132,22 @@ export default function Questionnaire() {
   }
 
   async function handleSubmit() {
-    const response = await fetch("/api/recommend", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
+    setSubmitting(true);
+    try {
+      const response = await fetch("/api/recommend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    if (!response.ok) return;
+      if (!response.ok) return;
 
-    const { recommendation } = await response.json();
-    const params = new URLSearchParams({ data: JSON.stringify(recommendation) });
-    router.push(`/results?${params}`);
+      const { recommendation } = await response.json();
+      const params = new URLSearchParams({ data: JSON.stringify(recommendation) });
+      router.push(`/results?${params}`);
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   useEffect(() => {
@@ -161,11 +168,8 @@ export default function Questionnaire() {
 
   return (
     <main className="flex flex-1 flex-col">
-      <nav className="border-b border-foreground/10 px-6 py-4">
-        <Link href="/" className="font-semibold tracking-tight">
-          StackRec
-        </Link>
-      </nav>
+      <LoadingOverlay visible={submitting} label="Generating recommendation" />
+      <AppHeader />
 
       <div
         ref={contentRef}

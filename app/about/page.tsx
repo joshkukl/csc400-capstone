@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AppHeader } from "@/components/AppHeader";
 
 const flowSteps = [
   {
@@ -28,11 +29,7 @@ const futureFeatures = [
 export default function AboutPage() {
   return (
     <main className="flex flex-1 flex-col">
-      <nav className="border-b border-foreground/10 px-6 py-4">
-        <Link href="/" className="font-semibold tracking-tight">
-          StackRec
-        </Link>
-      </nav>
+      <AppHeader />
 
       <section className="px-6 py-16">
         <div className="mx-auto max-w-3xl">

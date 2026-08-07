@@ -4,6 +4,7 @@ import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import type { LayerResult, Recommendation } from "@/types/recommend";
+import { AppHeader } from "@/components/AppHeader";
 import { StackDiagram } from "@/components/StackDiagram";
 import {
   prefersReducedMotion,
@@ -189,11 +190,7 @@ function ResultsFallback() {
 export default function ResultsPage() {
   return (
     <main className="flex flex-1 flex-col">
-      <nav className="border-b border-foreground/10 px-6 py-4">
-        <Link href="/" className="font-semibold tracking-tight">
-          StackRec
-        </Link>
-      </nav>
+      <AppHeader />
 
       <div className="mx-auto w-full max-w-2xl flex-1 px-6 py-12">
         <Suspense fallback={<ResultsFallback />}>

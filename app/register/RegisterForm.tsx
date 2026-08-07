@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PasswordInput } from "@/components/PasswordInput";
+import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { register } from "@/lib/authClient";
 
 export function RegisterForm() {
@@ -35,6 +36,7 @@ export function RegisterForm() {
 
   return (
     <div className="rounded-2xl border border-foreground/10 p-8">
+      <LoadingOverlay visible={loading} label="Creating account" />
       <h1 className="text-2xl font-semibold tracking-tight">Create account</h1>
       <p className="mt-1 text-sm text-foreground/50">
         Register to start your stack recommendation.

@@ -3,12 +3,16 @@ import type { NextRequest } from "next/server";
 import { getSessionFromRequest } from "@/lib/auth";
 
 export async function proxy(request: NextRequest) {
-  if (request.nextUrl.pathname.startsWith("/questionnaire")) {
+  const pathname = request.nextUrl.pathname;
+  const isProtected =
+    pathname.startsWith("/questionnaire") || pathname.startsWith("/account");
+
+  if (isProtected) {
     const session = await getSessionFromRequest(request);
 
     if (!session) {
       const loginUrl = new URL("/login", request.url);
-      loginUrl.searchParams.set("redirect", request.nextUrl.pathname);
+      loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
   }
@@ -17,5 +21,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/questionnaire/:path*"],
+  matcher: ["/questionnaire/:path*", "/account/:path*"],
 };

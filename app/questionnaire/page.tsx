@@ -131,24 +131,29 @@ export default function Questionnaire() {
     setStepIndex((i) => i - 1);
   }
 
-  async function handleSubmit() {
-    setSubmitting(true);
-    try {
-      const response = await fetch("/api/recommend", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+async function handleSubmit() {
+  setSubmitting(true);
 
-      if (!response.ok) return;
+  try {
+    const response = await fetch("/api/recommend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
 
-      const { recommendation } = await response.json();
-      const params = new URLSearchParams({ data: JSON.stringify(recommendation) });
-      router.push(`/results?${params}`);
-    } finally {
-      setSubmitting(false);
-    }
+    if (!response.ok) return;
+
+    const { recommendation } = await response.json();
+    const params = new URLSearchParams({
+      data: JSON.stringify(recommendation),
+      inputs: JSON.stringify(formData),
+    });
+
+    router.push(`/results?${params}`);
+  } finally {
+    setSubmitting(false);
   }
+}
 
   useEffect(() => {
     const root = contentRef.current;

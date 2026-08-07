@@ -49,7 +49,7 @@ const VALUE_LABELS: Record<string, Record<string, string>> = {
   languagePreference: {
     js: "JavaScript / TypeScript", python: "Python", go: "Go",
     java: "Java / Kotlin", dotnet: "C# / .NET", ruby: "Ruby",
-    rust: "Rust", none: "No preference",
+    rust: "Rust", cpp: "C / C++", none: "No preference",
   },
   userLoad: { tiny: "Under 100", small: "100–10,000", medium: "10,000–1M", large: "1M+" },
   realTime: { yes: "Yes", no: "No" },

@@ -26,7 +26,7 @@ export const STEPS: Step[] = [
           { label: "Consumers (B2C)", value: "b2c" },
           { label: "Businesses (B2B)", value: "b2b" },
           { label: "Internal team only", value: "internal" },
-          { label: "Mixed / Both", value: "mixed" },
+          { label: "Mixed", value: "mixed" },
         ],
       },
       {
@@ -40,6 +40,7 @@ export const STEPS: Step[] = [
           { label: "C# / .NET", value: "dotnet" },
           { label: "Ruby", value: "ruby" },
           { label: "Rust", value: "rust" },
+          { label: "C / C++", value: "cpp" },
           { label: "No preference", value: "none" },
         ],
       },
@@ -57,6 +58,7 @@ export const STEPS: Step[] = [
           { label: "100 – 10,000", value: "small" },
           { label: "10,000 – 1M", value: "medium" },
           { label: "1M+", value: "large" },
+          { label: "Not sure yet", value: "unsure" },
         ],
       },
       {
@@ -75,6 +77,7 @@ export const STEPS: Step[] = [
           { label: "Relational / complex queries", value: "relational" },
           { label: "Heavy analytics or reporting", value: "analytics" },
           { label: "Unstructured / document data", value: "document" },
+          { label: "Not sure yet", value: "unsure" },
         ],
       },
     ],

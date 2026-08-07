@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { HoverGrowLink } from "@/components/HoverGrowLink";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
@@ -30,20 +31,28 @@ export function AuthNavLinks() {
   }
 
   if (loading) {
-    return <div className="h-11 w-32" aria-hidden="true" />;
+    return <div className="h-11 w-40" aria-hidden="true" />;
   }
 
   if (username) {
     return (
       <>
         <LoadingOverlay visible={loggingOut} label="Logging out" />
-        <div className="flex items-center gap-4 text-sm">
-          <span className="text-white/55">Signed in as {username}</span>
+        <div className="flex items-center gap-4 text-sm sm:gap-5">
+          <span className="max-w-[10rem] truncate text-white/55 sm:max-w-none">
+            Signed in as {username}
+          </span>
+          <Link
+            href="/account"
+            className="shrink-0 font-medium text-white transition-colors hover:text-white/70"
+          >
+            Account Info
+          </Link>
           <button
             type="button"
             onClick={handleLogout}
             disabled={loggingOut}
-            className="font-medium text-white transition-colors hover:text-white/70 disabled:opacity-50"
+            className="shrink-0 font-medium text-white transition-colors hover:text-white/70 disabled:opacity-50"
           >
             Log out
           </button>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { animate } from "animejs";
 import { AuthNavLinks } from "@/components/AuthNavLinks";
 import { HoverGrowLink } from "@/components/HoverGrowLink";
 import { NeuralNetworkBackground } from "@/components/three/NeuralNetworkBackground";
@@ -25,6 +26,8 @@ const features = [
 
 const REVEAL_STAGGER_MS = 250;
 const CONTENT_FALLBACK_MS = 3500;
+const BODY_HOVER_DURATION = 320;
+const BODY_HOVER_SHIFT = 28;
 
 const HERO_HEADING_OUTLINE =
   "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 0 18px rgba(0,0,0,0.35)";
@@ -45,6 +48,10 @@ function revealClass(contentRevealed: boolean) {
 
 export function HomeLanding() {
   const [contentRevealed, setContentRevealed] = useState(false);
+  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const bodyRef = useRef<HTMLParagraphElement>(null);
+  const buttonsRef = useRef<HTMLDivElement>(null);
+  const hoverAnimationsRef = useRef<Array<{ pause: () => void }>>([]);
 
   const handleIntroComplete = useCallback(() => {
     setContentRevealed(true);
@@ -57,6 +64,63 @@ export function HomeLanding() {
 
     return () => window.clearTimeout(fallbackTimer);
   }, []);
+
+  function stopHoverAnimations() {
+    for (const animation of hoverAnimationsRef.current) {
+      animation.pause();
+    }
+    hoverAnimationsRef.current = [];
+  }
+
+  function handleBodyEnter() {
+    if (!headlineRef.current || !bodyRef.current || !buttonsRef.current) return;
+
+    stopHoverAnimations();
+
+    hoverAnimationsRef.current = [
+      animate(bodyRef.current, {
+        scale: 1.5,
+        opacity: 1,
+        duration: BODY_HOVER_DURATION,
+        ease: "outQuad",
+      }),
+      animate(headlineRef.current, {
+        translateY: -BODY_HOVER_SHIFT,
+        duration: BODY_HOVER_DURATION,
+        ease: "outQuad",
+      }),
+      animate(buttonsRef.current, {
+        translateY: BODY_HOVER_SHIFT,
+        duration: BODY_HOVER_DURATION,
+        ease: "outQuad",
+      }),
+    ];
+  }
+
+  function handleBodyLeave() {
+    if (!headlineRef.current || !bodyRef.current || !buttonsRef.current) return;
+
+    stopHoverAnimations();
+
+    hoverAnimationsRef.current = [
+      animate(bodyRef.current, {
+        scale: 1,
+        opacity: 1,
+        duration: BODY_HOVER_DURATION,
+        ease: "outQuad",
+      }),
+      animate(headlineRef.current, {
+        translateY: 0,
+        duration: BODY_HOVER_DURATION,
+        ease: "outQuad",
+      }),
+      animate(buttonsRef.current, {
+        translateY: 0,
+        duration: BODY_HOVER_DURATION,
+        ease: "outQuad",
+      }),
+    ];
+  }
 
   return (
     <main className="relative flex min-h-full flex-1 flex-col overflow-hidden bg-[radial-gradient(circle_at_center,#10151d_0%,#05070c_55%,#020308_100%)] text-white">
@@ -91,25 +155,37 @@ export function HomeLanding() {
             Tech-Stack Recommendation Engine
           </span>
           <h1
+            ref={headlineRef}
             className={`max-w-3xl text-5xl font-bold tracking-tight leading-tight text-white sm:text-6xl lg:text-7xl ${revealClass(contentRevealed)}`}
             style={{
               ...revealStyle(3, contentRevealed),
               textShadow: HERO_HEADING_OUTLINE,
+              willChange: "transform",
             }}
           >
             Find the right stack for your next project
           </h1>
           <p
-            className={`mt-6 max-w-xl text-xl leading-relaxed text-white sm:text-2xl ${revealClass(contentRevealed)}`}
-            style={revealStyle(4, contentRevealed)}
+            ref={bodyRef}
+            onMouseEnter={handleBodyEnter}
+            onMouseLeave={handleBodyLeave}
+            className={`mt-6 max-w-xl origin-center cursor-default text-xl leading-relaxed text-white sm:text-2xl ${revealClass(contentRevealed)}`}
+            style={{
+              ...revealStyle(4, contentRevealed),
+              willChange: "transform, opacity",
+            }}
           >
             Answer a few questions about your project&apos;s requirements and get
             a tailored technology stack recommendation — with pros, cons, and an
             architecture diagram included.
           </p>
           <div
+            ref={buttonsRef}
             className={`mt-10 flex flex-col gap-4 sm:flex-row ${revealClass(contentRevealed)}`}
-            style={revealStyle(5, contentRevealed)}
+            style={{
+              ...revealStyle(5, contentRevealed),
+              willChange: "transform",
+            }}
           >
             <HoverGrowLink
               href="/questionnaire"

@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { AppHeader } from "@/components/AppHeader";
+import { LoadingOverlay } from "@/components/LoadingOverlay";
 import type { LayerResult } from "@/types/recommend";
 
 type SavedRecommendation = {
@@ -172,6 +174,7 @@ export default function HistoryPage() {
   const [error, setError] = useState("");
   const [compareMode, setCompareMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [comparing, setComparing] = useState(false);
   const [clearConfirm, setClearConfirm] = useState(false);
 
   useEffect(() => {
@@ -207,6 +210,7 @@ export default function HistoryPage() {
 
   function goCompare() {
     if (selectedIds.length === 2) {
+      setComparing(true);
       router.push(`/compare?a=${selectedIds[0]}&b=${selectedIds[1]}`);
     }
   }
@@ -236,11 +240,8 @@ export default function HistoryPage() {
 
   return (
     <main className="flex flex-1 flex-col">
-      <nav className="border-b border-foreground/10 px-6 py-4">
-        <Link href="/" className="font-semibold tracking-tight">
-          StackRec
-        </Link>
-      </nav>
+      <LoadingOverlay visible={comparing} label="Loading comparison" />
+      <AppHeader />
 
       <div className="mx-auto w-full max-w-2xl flex-1 px-6 py-12">
         <div className="mb-8 flex items-center justify-between">

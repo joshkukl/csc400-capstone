@@ -63,3 +63,27 @@ export async function logout(): Promise<void> {
     credentials: "include",
   });
 }
+
+export async function changePassword(
+  currentPassword: string,
+  newPassword: string,
+  confirmPassword: string,
+): Promise<{ success?: boolean; error?: string }> {
+  const response = await fetch("/api/auth/change-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
+  });
+
+  const data = (await response.json()) as {
+    success?: boolean;
+    error?: string;
+  };
+
+  if (!response.ok) {
+    return { error: data.error ?? "Unable to update password." };
+  }
+
+  return { success: true };
+}

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { AppHeader } from "@/components/AppHeader";
 import type { LayerResult } from "@/types/recommend";
 
 type SavedRec = {
@@ -241,11 +242,7 @@ function CompareContent() {
 export default function ComparePage() {
   return (
     <main className="flex flex-1 flex-col">
-      <nav className="border-b border-foreground/10 px-6 py-4">
-        <Link href="/" className="font-semibold tracking-tight">
-          StackRec
-        </Link>
-      </nav>
+      <AppHeader />
 
       <div className="mx-auto w-full max-w-3xl flex-1 px-6 py-12">
         <div className="mb-8">

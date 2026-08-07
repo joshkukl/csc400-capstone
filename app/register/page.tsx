@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { Suspense } from "react";
+import { AppHeader } from "@/components/AppHeader";
 import { RegisterForm } from "./RegisterForm";
 
 function RegisterFormFallback() {
@@ -14,11 +14,7 @@ function RegisterFormFallback() {
 export default function RegisterPage() {
   return (
     <main className="flex flex-1 flex-col">
-      <nav className="border-b border-foreground/10 px-6 py-4">
-        <Link href="/" className="font-semibold tracking-tight">
-          StackRec
-        </Link>
-      </nav>
+      <AppHeader />
 
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-12">
         <Suspense fallback={<RegisterFormFallback />}>

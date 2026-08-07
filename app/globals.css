@@ -24,3 +24,68 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
 }
+
+.loading-dot {
+  display: block;
+  height: 0.7rem;
+  width: 0.7rem;
+  border-radius: 9999px;
+  background-color: #ffffff;
+}
+
+.loading-dot-green {
+  animation: loading-dot-pulse-green 1.05s ease-in-out infinite;
+  animation-delay: 0ms;
+}
+
+.loading-dot-cyan {
+  animation: loading-dot-pulse-cyan 1.05s ease-in-out infinite;
+  animation-delay: 175ms;
+}
+
+.loading-dot-purple {
+  animation: loading-dot-pulse-purple 1.05s ease-in-out infinite;
+  animation-delay: 350ms;
+}
+
+@keyframes loading-dot-pulse-green {
+  0%,
+  100% {
+    transform: scale(1);
+    background-color: #ffffff;
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.55);
+    background-color: #48ff9b;
+    opacity: 1;
+  }
+}
+
+@keyframes loading-dot-pulse-cyan {
+  0%,
+  100% {
+    transform: scale(1);
+    background-color: #ffffff;
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.55);
+    background-color: #6fffe9;
+    opacity: 1;
+  }
+}
+
+@keyframes loading-dot-pulse-purple {
+  0%,
+  100% {
+    transform: scale(1);
+    background-color: #ffffff;
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.55);
+    background-color: #9b35ff;
+    opacity: 1;
+  }
+}

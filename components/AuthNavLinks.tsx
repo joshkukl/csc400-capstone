@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { HoverGrowLink } from "@/components/HoverGrowLink";
+import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { fetchCurrentUser, logout } from "@/lib/authClient";
 
 export function AuthNavLinks() {
   const router = useRouter();
   const [username, setUsername] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     fetchCurrentUser()
@@ -17,9 +19,14 @@ export function AuthNavLinks() {
   }, []);
 
   async function handleLogout() {
-    await logout();
-    setUsername(null);
-    router.refresh();
+    setLoggingOut(true);
+    try {
+      await logout();
+      setUsername(null);
+      router.refresh();
+    } finally {
+      setLoggingOut(false);
+    }
   }
 
   if (loading) {
@@ -28,16 +35,20 @@ export function AuthNavLinks() {
 
   if (username) {
     return (
-      <div className="flex items-center gap-4 text-sm">
-        <span className="text-white/55">Signed in as {username}</span>
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="font-medium text-white transition-colors hover:text-white/70"
-        >
-          Log out
-        </button>
-      </div>
+      <>
+        <LoadingOverlay visible={loggingOut} label="Logging out" />
+        <div className="flex items-center gap-4 text-sm">
+          <span className="text-white/55">Signed in as {username}</span>
+          <button
+            type="button"
+            onClick={handleLogout}
+            disabled={loggingOut}
+            className="font-medium text-white transition-colors hover:text-white/70 disabled:opacity-50"
+          >
+            Log out
+          </button>
+        </div>
+      </>
     );
   }
 

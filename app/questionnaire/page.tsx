@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { FormData, Field, Step } from "@/types/questionnaire";
 import { STEPS, INITIAL_FORM_DATA } from "@/constants/questionnaire";
+import { AppHeader } from "@/components/AppHeader";
+import { LoadingOverlay } from "@/components/LoadingOverlay";
 import {
   prefersReducedMotion,
   revealImmediately,
@@ -111,6 +112,7 @@ export default function Questionnaire() {
   const router = useRouter();
   const [stepIndex, setStepIndex] = useState(0);
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
+  const [submitting, setSubmitting] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const currentStep = STEPS[stepIndex];
@@ -129,7 +131,10 @@ export default function Questionnaire() {
     setStepIndex((i) => i - 1);
   }
 
-  async function handleSubmit() {
+async function handleSubmit() {
+  setSubmitting(true);
+
+  try {
     const response = await fetch("/api/recommend", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -143,8 +148,12 @@ export default function Questionnaire() {
       data: JSON.stringify(recommendation),
       inputs: JSON.stringify(formData),
     });
+
     router.push(`/results?${params}`);
+  } finally {
+    setSubmitting(false);
   }
+}
 
   useEffect(() => {
     const root = contentRef.current;
@@ -164,11 +173,8 @@ export default function Questionnaire() {
 
   return (
     <main className="flex flex-1 flex-col">
-      <nav className="border-b border-foreground/10 px-6 py-4">
-        <Link href="/" className="font-semibold tracking-tight">
-          StackRec
-        </Link>
-      </nav>
+      <LoadingOverlay visible={submitting} label="Generating recommendation" />
+      <AppHeader />
 
       <div
         ref={contentRef}

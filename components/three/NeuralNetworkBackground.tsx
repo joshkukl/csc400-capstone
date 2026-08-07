@@ -26,7 +26,6 @@ export function NeuralNetworkBackground({
     const CENTRAL_CLUSTER_COUNT = 14;
     const REVEAL_FADE_BAND = 0.55;
     const COVERAGE_SCALE = 1.14;
-    const LAYER_COUNT = 4;
 
     const INTRO_EXPAND_DURATION = 1.75;
     const FLASH_START = 1.75;
@@ -144,29 +143,58 @@ export function NeuralNetworkBackground({
         name: "east",
         rotation: new THREE.Euler(0, 0, 0),
         offset: new THREE.Vector3(0, 0, 0),
+        scale: 1,
       },
       {
         name: "north",
         rotation: new THREE.Euler(0, 0, Math.PI * 0.5),
         offset: new THREE.Vector3(0, 0.05, 0.07),
+        scale: 1,
       },
       {
         name: "southeast",
         rotation: new THREE.Euler(0.58, -0.46, -0.14),
         offset: new THREE.Vector3(0.13, -0.15, -0.2),
+        scale: 1,
       },
       {
         name: "southwest",
         rotation: new THREE.Euler(0.58, 0.46, 0.14),
         offset: new THREE.Vector3(-0.13, -0.15, 0.2),
+        scale: 1,
+      },
+      // Depth layers: farther back on z, slightly smaller, spread for even coverage
+      {
+        name: "depth-northwest",
+        rotation: new THREE.Euler(0.22, 0.35, 0.18),
+        offset: new THREE.Vector3(-2.15, 1.55, -2.35),
+        scale: 0.86,
+      },
+      {
+        name: "depth-southeast",
+        rotation: new THREE.Euler(-0.28, -0.4, -0.16),
+        offset: new THREE.Vector3(2.35, -1.45, -2.75),
+        scale: 0.82,
+      },
+      {
+        name: "depth-southwest",
+        rotation: new THREE.Euler(0.34, 0.28, -0.22),
+        offset: new THREE.Vector3(-1.75, -1.85, -3.25),
+        scale: 0.78,
       },
     ];
+
+    const LAYER_COUNT = layerTransforms.length;
 
     function transformPosition(
       position: THREE.Vector3,
       layer: (typeof layerTransforms)[number],
     ) {
-      return position.clone().applyEuler(layer.rotation).add(layer.offset);
+      return position
+        .clone()
+        .multiplyScalar(layer.scale)
+        .applyEuler(layer.rotation)
+        .add(layer.offset);
     }
 
     type NetworkNode = {

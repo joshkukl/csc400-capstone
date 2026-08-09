@@ -3,34 +3,28 @@ import type { FormData } from "@/types/questionnaire";
 import { recommend } from "@/lib/recommend";
 import { prisma } from "@/lib/db";
 import { getSessionFromRequest } from "@/lib/auth";
-
-const REQUIRED_FIELDS: (keyof FormData)[] = [
-  "projectType",
-  "audience",
-  "languagePreference",
-  "userLoad",
-  "realTime",
-  "dataNeed",
-  "timeline",
-  "experience",
-  "priority",
-];
+import { validateQuestionnaire } from "@/lib/validation";
 
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as Partial<FormData>;
 
-    for (const key of REQUIRED_FIELDS) {
-      if (!body[key]) {
-        return NextResponse.json(
-          { error: `Missing required field: ${key}` },
-          { status: 400 },
-        );
-      }
+    const validation = validateQuestionnaire(body);
+
+    if (!validation.valid) {
+      return NextResponse.json(
+        {
+          error: "Invalid questionnaire data.",
+          fields: validation.errors,
+        },
+        { status: 400 },
+      );
     }
 
     const data = body as FormData;
+
     const recommendation = recommend(data);
+
     const session = await getSessionFromRequest(request);
 
     await prisma.recommendation.create({
@@ -43,10 +37,16 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ recommendation });
-  } catch {
+    return NextResponse.json({
+      recommendation,
+    });
+  } catch (error) {
+    console.error("Recommendation API error:", error);
+
     return NextResponse.json(
-      { error: "Failed to generate recommendation." },
+      {
+        error: "Failed to generate recommendation.",
+      },
       { status: 500 },
     );
   }

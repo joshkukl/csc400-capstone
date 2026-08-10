@@ -43,10 +43,16 @@ export function AuthNavLinks() {
             Signed in as {username}
           </span>
           <Link
+            href="/history"
+            className="shrink-0 font-medium text-white transition-colors hover:text-white/70"
+          >
+            History
+          </Link>
+          <Link
             href="/account"
             className="shrink-0 font-medium text-white transition-colors hover:text-white/70"
           >
-            Account Info
+            Account
           </Link>
           <button
             type="button"

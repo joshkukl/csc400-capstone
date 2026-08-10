@@ -8,16 +8,22 @@ export function AppHeader() {
       </Link>
       <div className="flex items-center gap-4 text-sm">
         <Link
-          href="/account"
-          className="font-medium transition-colors hover:text-foreground/70"
+          href="/history"
+          className="text-foreground/60 transition-colors hover:text-foreground"
         >
-          Account Info
+          History
+        </Link>
+        <Link
+          href="/account"
+          className="text-foreground/60 transition-colors hover:text-foreground"
+        >
+          Account
         </Link>
         <Link
           href="/questionnaire"
-          className="font-medium transition-colors hover:text-foreground/70"
+          className="inline-flex h-8 items-center justify-center rounded-full bg-foreground px-4 font-medium text-background transition-colors hover:bg-foreground/85"
         >
-          Get Recommendation
+          New
         </Link>
       </div>
     </nav>

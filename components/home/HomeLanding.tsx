@@ -32,6 +32,19 @@ const BODY_HOVER_SHIFT = 28;
 const HERO_HEADING_OUTLINE =
   "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 0 18px rgba(0,0,0,0.35)";
 
+const BADGE_TEXT_SHADOW =
+  "0 0 10px rgba(0,0,0,0.45), 0 1px 2px rgba(0,0,0,0.55), -0.5px -0.5px 0 rgba(0,0,0,0.35), 0.5px 0.5px 0 rgba(0,0,0,0.35)";
+
+/** Shared frosted glass look for badge, CTAs, and How it Works label */
+const FROSTED_SURFACE_CLASS =
+  "rounded-full border border-white/30 bg-white/10 text-white shadow-[0_0_18px_rgba(111,255,233,0.12)] backdrop-blur-md [-webkit-backdrop-filter:blur(10px)]";
+
+const FROSTED_BADGE_CLASS = `${FROSTED_SURFACE_CLASS} inline-block px-3 py-1 text-sm`;
+
+const FROSTED_CTA_CLASS = `${FROSTED_SURFACE_CLASS} inline-flex h-11 items-center justify-center px-8 text-sm font-medium transition-[background-color] duration-200 hover:bg-black/25`;
+
+const FROSTED_SECTION_LABEL_CLASS = `${FROSTED_SURFACE_CLASS} inline-block px-4 py-1.5 text-2xl font-semibold tracking-tight`;
+
 function revealStyle(step: number, contentRevealed: boolean) {
   return {
     transitionDelay: contentRevealed ? `${step * REVEAL_STAGGER_MS}ms` : "0ms",
@@ -48,8 +61,9 @@ function revealClass(contentRevealed: boolean) {
 
 export function HomeLanding() {
   const [contentRevealed, setContentRevealed] = useState(false);
+  const badgeRef = useRef<HTMLSpanElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
-  const bodyRef = useRef<HTMLParagraphElement>(null);
+  const bodyWrapRef = useRef<HTMLDivElement>(null);
   const buttonsRef = useRef<HTMLDivElement>(null);
   const hoverAnimationsRef = useRef<Array<{ pause: () => void }>>([]);
 
@@ -73,14 +87,25 @@ export function HomeLanding() {
   }
 
   function handleBodyEnter() {
-    if (!headlineRef.current || !bodyRef.current || !buttonsRef.current) return;
+    if (
+      !badgeRef.current ||
+      !headlineRef.current ||
+      !bodyWrapRef.current ||
+      !buttonsRef.current
+    ) {
+      return;
+    }
 
     stopHoverAnimations();
 
     hoverAnimationsRef.current = [
-      animate(bodyRef.current, {
+      animate(bodyWrapRef.current, {
         scale: 1.5,
-        opacity: 1,
+        duration: BODY_HOVER_DURATION,
+        ease: "outQuad",
+      }),
+      animate(badgeRef.current, {
+        translateY: -BODY_HOVER_SHIFT,
         duration: BODY_HOVER_DURATION,
         ease: "outQuad",
       }),
@@ -98,14 +123,25 @@ export function HomeLanding() {
   }
 
   function handleBodyLeave() {
-    if (!headlineRef.current || !bodyRef.current || !buttonsRef.current) return;
+    if (
+      !badgeRef.current ||
+      !headlineRef.current ||
+      !bodyWrapRef.current ||
+      !buttonsRef.current
+    ) {
+      return;
+    }
 
     stopHoverAnimations();
 
     hoverAnimationsRef.current = [
-      animate(bodyRef.current, {
+      animate(bodyWrapRef.current, {
         scale: 1,
-        opacity: 1,
+        duration: BODY_HOVER_DURATION,
+        ease: "outQuad",
+      }),
+      animate(badgeRef.current, {
+        translateY: 0,
         duration: BODY_HOVER_DURATION,
         ease: "outQuad",
       }),
@@ -149,8 +185,13 @@ export function HomeLanding() {
 
         <section className="flex flex-1 flex-col items-center justify-center px-6 py-24 text-center">
           <span
-            className={`mb-4 inline-block rounded-full border border-white/15 px-3 py-1 text-sm text-white/55 ${revealClass(contentRevealed)}`}
-            style={revealStyle(2, contentRevealed)}
+            ref={badgeRef}
+            className={`mb-4 ${FROSTED_BADGE_CLASS} ${revealClass(contentRevealed)}`}
+            style={{
+              ...revealStyle(2, contentRevealed),
+              textShadow: BADGE_TEXT_SHADOW,
+              willChange: "transform",
+            }}
           >
             Tech-Stack Recommendation Engine
           </span>
@@ -165,20 +206,32 @@ export function HomeLanding() {
           >
             Find the right stack for your next project
           </h1>
-          <p
-            ref={bodyRef}
+
+          <div
+            ref={bodyWrapRef}
             onMouseEnter={handleBodyEnter}
             onMouseLeave={handleBodyLeave}
-            className={`mt-6 max-w-xl origin-center cursor-default text-xl leading-relaxed text-white sm:text-2xl ${revealClass(contentRevealed)}`}
+            className={`relative mt-6 max-w-xl origin-center cursor-default ${revealClass(contentRevealed)}`}
             style={{
               ...revealStyle(4, contentRevealed),
-              willChange: "transform, opacity",
+              willChange: "transform",
             }}
           >
-            Answer a few questions about your project&apos;s requirements and get
-            a tailored technology stack recommendation — with pros, cons, and an
-            architecture diagram included.
-          </p>
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 -z-0 rounded-[2rem]"
+              style={{
+                background:
+                  "radial-gradient(ellipse at center, rgba(5,7,12,0.52) 0%, rgba(5,7,12,0.28) 52%, rgba(5,7,12,0.08) 72%, transparent 84%)",
+              }}
+            />
+            <p className="relative z-10 px-7 py-5 text-xl leading-relaxed text-white sm:text-2xl">
+              Answer a few questions about your project&apos;s requirements and get
+              a tailored technology stack recommendation — with pros, cons, and an
+              architecture diagram included.
+            </p>
+          </div>
+
           <div
             ref={buttonsRef}
             className={`mt-10 flex flex-col gap-4 sm:flex-row ${revealClass(contentRevealed)}`}
@@ -187,16 +240,10 @@ export function HomeLanding() {
               willChange: "transform",
             }}
           >
-            <HoverGrowLink
-              href="/questionnaire"
-              className="inline-flex h-11 items-center justify-center rounded-full bg-white px-8 text-sm font-medium text-[#05070c] transition-colors hover:bg-white/85"
-            >
+            <HoverGrowLink href="/questionnaire" className={FROSTED_CTA_CLASS} style={{ textShadow: BADGE_TEXT_SHADOW }}>
               Get Started
             </HoverGrowLink>
-            <HoverGrowLink
-              href="/about"
-              className="inline-flex h-11 items-center justify-center rounded-full border border-white/15 px-8 text-sm font-medium transition-colors hover:bg-white/5"
-            >
+            <HoverGrowLink href="/about" className={FROSTED_CTA_CLASS} style={{ textShadow: BADGE_TEXT_SHADOW }}>
               Learn More
             </HoverGrowLink>
           </div>
@@ -207,8 +254,13 @@ export function HomeLanding() {
           style={revealStyle(6, contentRevealed)}
         >
           <div className="mx-auto max-w-4xl">
-            <h2 className="mb-12 text-center text-2xl font-semibold tracking-tight">
-              How it works
+            <h2 className="mb-12 text-center">
+              <span
+                className={FROSTED_SECTION_LABEL_CLASS}
+                style={{ textShadow: BADGE_TEXT_SHADOW }}
+              >
+                How it works
+              </span>
             </h2>
             <div className="grid gap-6 sm:grid-cols-3">
               {features.map((feature, i) => (
